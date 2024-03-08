@@ -1,1 +1,1055 @@
-
+[
+    {
+        "id": "b2667f9e6281a13b",
+        "type": "tab",
+        "label": "MHD Filtered and OffSeted",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "6a396720685e565c",
+        "type": "inject",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 240,
+        "wires": [
+            [
+                "f6e1a7cec8d74ed4"
+            ]
+        ]
+    },
+    {
+        "id": "f6e1a7cec8d74ed4",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "Next 10 Buses From Stop",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.golemio.cz/v2/pid/departureboards/?ids=ZDE VLOZTE KOD ZASTAVKY&total=10&preferredTimezone=Europe%2FPrague&minutesBefore=-5",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "Content-Type",
+                "keyValue": "",
+                "valueType": "other",
+                "valueValue": "application/json; charset=utf-8"
+            },
+            {
+                "keyType": "other",
+                "keyValue": "x-access-token",
+                "valueType": "other",
+                "valueValue": "[GOLEMIO API KEY HERE]"
+            }
+        ],
+        "x": 230,
+        "y": 400,
+        "wires": [
+            [
+                "9506a77a20fb5910",
+                "abcd7416f7328503"
+            ]
+        ]
+    },
+    {
+        "id": "8f549cf20c6c95b6",
+        "type": "function",
+        "z": "b2667f9e6281a13b",
+        "name": "PUT format #0 route",
+        "func": "let Filtered_Departures = msg.payload\n\nlet poradi = \"0\" //zde je poradove cislo spoje, na ktery se ptame (0 = prvni)\nlet url = \"http://in.zivyobraz.eu/\"\nlet key = \"MEZI UVOZOVKY VLOZTE VAS TOKEN PRO VSTUP DAT DO ZIVY OBRAZ\"\nlet legend_time_A = \"Z3_Poradi_\" // Z3 znamena ze je to moje treti zastavka, o kterou se zajimam\nlet legend_time_B = \"_Odjezd\"\nlet legend_line_name = \"_Linka\"\nlet legend_destination = \"_Smer\"\nlet str = \" \"\nlet time = \"\"\nlet linka = \"\"\nlet smer = \"\"\n\nstr = Filtered_Departures[poradi].departure_timestamp.scheduled\ntime = str.slice(11, 16)\nlet time_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_time_B + \"=\" + time\nmsg.payload = time_vystup.slice(0, 220)\nvar msg_time = { payload: msg.payload };\n\nlinka = Filtered_Departures[poradi].route.short_name\nlet linka_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_line_name + \"=\" + linka\nmsg.payload = linka_vystup.slice(0, 220)\nvar msg_linka = { payload: msg.payload };\n\nsmer = Filtered_Departures[poradi].trip.headsign\nlet smer_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_destination + \"=\" + smer\nmsg.payload = smer_vystup.slice(0, 220)\nvar msg_smer = { payload: msg.payload };\n\n\nreturn [msg_time, msg_linka, msg_smer];",
+        "outputs": 3,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 220,
+        "wires": [
+            [
+                "3c57443cd2f034a9"
+            ],
+            [
+                "172797be7a7411d2"
+            ],
+            [
+                "466da8a9e169494a"
+            ]
+        ]
+    },
+    {
+        "id": "a58a1c3edf96fa04",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "fba3f223132b130f",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "26342884e12a24eb",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "3c57443cd2f034a9",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 180,
+        "wires": [
+            [
+                "463cfb6774d9daba"
+            ]
+        ]
+    },
+    {
+        "id": "463cfb6774d9daba",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 180,
+        "wires": [
+            [
+                "fba3f223132b130f"
+            ]
+        ]
+    },
+    {
+        "id": "172797be7a7411d2",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 220,
+        "wires": [
+            [
+                "f346afd1a7d540f9"
+            ]
+        ]
+    },
+    {
+        "id": "f346afd1a7d540f9",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 220,
+        "wires": [
+            [
+                "26342884e12a24eb"
+            ]
+        ]
+    },
+    {
+        "id": "466da8a9e169494a",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 260,
+        "wires": [
+            [
+                "1d6cfe975f71bddf"
+            ]
+        ]
+    },
+    {
+        "id": "1d6cfe975f71bddf",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 260,
+        "wires": [
+            [
+                "a58a1c3edf96fa04"
+            ]
+        ]
+    },
+    {
+        "id": "9506a77a20fb5910",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "debug 16",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 380,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "abcd7416f7328503",
+        "type": "function",
+        "z": "b2667f9e6281a13b",
+        "name": "Filter for relevant lines",
+        "func": "msg.Depature_Event = msg.payload\n\nvar definedList = [\"100\",\"101\",\"102\",\"15\"];\n//list lines that you want to see information about, rest will be skipped\n\nvar departures = msg.Depature_Event.departures;\n\nvar filteredDepartures = departures.filter(function(departure) {\n    // We return true if the route short name is in the defined list, false otherwise\n    return definedList.includes(departure.route.short_name);\n});\n\nmsg.payload = filteredDepartures\nvar msg_filteredDepartures = { payload: msg.payload };\n\nreturn [msg_filteredDepartures];\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 400,
+        "wires": [
+            [
+                "47cfeb124fa0ff2c",
+                "8f549cf20c6c95b6",
+                "63f2b1f7404308fa",
+                "50fe341f9fd9c894",
+                "85f2e96c8dfa718b"
+            ]
+        ]
+    },
+    {
+        "id": "47cfeb124fa0ff2c",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "debug 17",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "63f2b1f7404308fa",
+        "type": "function",
+        "z": "b2667f9e6281a13b",
+        "name": "PUT format #1 route",
+        "func": "let Filtered_Departures = msg.payload\n\nlet poradi = \"1\" //zde je poradove cislo spoje, na ktery se ptame (0 = prvni)\nlet url = \"http://in.zivyobraz.eu/\"\nlet key = \"MEZI UVOZOVKY VLOZTE VAS TOKEN PRO VSTUP DAT DO ZIVY OBRAZ\"\nlet legend_time_A = \"Z3_Poradi_\" // Z3 znamena ze je to moje treti zastavka, o kterou se zajimam\nlet legend_time_B = \"_Odjezd\"\nlet legend_line_name = \"_Linka\"\nlet legend_destination = \"_Smer\"\nlet str = \" \"\nlet time = \"\"\nlet linka = \"\"\nlet smer = \"\"\n\nstr = Filtered_Departures[poradi].departure_timestamp.scheduled\ntime = str.slice(11, 16)\nlet time_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_time_B + \"=\" + time\nmsg.payload = time_vystup.slice(0, 220)\nvar msg_time = { payload: msg.payload };\n\nlinka = Filtered_Departures[poradi].route.short_name\nlet linka_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_line_name + \"=\" + linka\nmsg.payload = linka_vystup.slice(0, 220)\nvar msg_linka = { payload: msg.payload };\n\nsmer = Filtered_Departures[poradi].trip.headsign\nlet smer_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_destination + \"=\" + smer\nmsg.payload = smer_vystup.slice(0, 220)\nvar msg_smer = { payload: msg.payload };\n\n\nreturn [msg_time, msg_linka, msg_smer];",
+        "outputs": 3,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 360,
+        "wires": [
+            [
+                "24f07f4e4a7bf337"
+            ],
+            [
+                "3cd34ed99e0a1692"
+            ],
+            [
+                "0307483da5103988"
+            ]
+        ]
+    },
+    {
+        "id": "b5afbc4c94203456",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "1fb176498cf98c69",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "75a69d192df8f59b",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "24f07f4e4a7bf337",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 320,
+        "wires": [
+            [
+                "2e68db336aa656ca"
+            ]
+        ]
+    },
+    {
+        "id": "2e68db336aa656ca",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 320,
+        "wires": [
+            [
+                "1fb176498cf98c69"
+            ]
+        ]
+    },
+    {
+        "id": "3cd34ed99e0a1692",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 360,
+        "wires": [
+            [
+                "9c531f981a389b08"
+            ]
+        ]
+    },
+    {
+        "id": "9c531f981a389b08",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 360,
+        "wires": [
+            [
+                "75a69d192df8f59b"
+            ]
+        ]
+    },
+    {
+        "id": "0307483da5103988",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 400,
+        "wires": [
+            [
+                "b2bfee997a5a3945"
+            ]
+        ]
+    },
+    {
+        "id": "b2bfee997a5a3945",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 400,
+        "wires": [
+            [
+                "b5afbc4c94203456"
+            ]
+        ]
+    },
+    {
+        "id": "50fe341f9fd9c894",
+        "type": "function",
+        "z": "b2667f9e6281a13b",
+        "name": "PUT format #2 route",
+        "func": "let Filtered_Departures = msg.payload\n\nlet poradi = \"2\" //zde je poradove cislo spoje, na ktery se ptame (0 = prvni)\nlet url = \"http://in.zivyobraz.eu/\"\nlet key = \"MEZI UVOZOVKY VLOZTE VAS TOKEN PRO VSTUP DAT DO ZIVY OBRAZ\"\nlet legend_time_A = \"Z3_Poradi_\" // Z3 znamena ze je to moje treti zastavka, o kterou se zajimam\nlet legend_time_B = \"_Odjezd\"\nlet legend_line_name = \"_Linka\"\nlet legend_destination = \"_Smer\"\nlet str = \" \"\nlet time = \"\"\nlet linka = \"\"\nlet smer = \"\"\n\nstr = Filtered_Departures[poradi].departure_timestamp.scheduled\ntime = str.slice(11, 16)\nlet time_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_time_B + \"=\" + time\nmsg.payload = time_vystup.slice(0, 220)\nvar msg_time = { payload: msg.payload };\n\nlinka = Filtered_Departures[poradi].route.short_name\nlet linka_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_line_name + \"=\" + linka\nmsg.payload = linka_vystup.slice(0, 220)\nvar msg_linka = { payload: msg.payload };\n\nsmer = Filtered_Departures[poradi].trip.headsign\nlet smer_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_destination + \"=\" + smer\nmsg.payload = smer_vystup.slice(0, 220)\nvar msg_smer = { payload: msg.payload };\n\n\nreturn [msg_time, msg_linka, msg_smer];",
+        "outputs": 3,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 500,
+        "wires": [
+            [
+                "8ca7bc070c17c1c1"
+            ],
+            [
+                "100134fa29e5b720"
+            ],
+            [
+                "f72a9b080c8110b8"
+            ]
+        ]
+    },
+    {
+        "id": "a24db7c13b9acd11",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "1ae9cdaed9dd7d99",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "0fcde3aca30bc419",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "8ca7bc070c17c1c1",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 460,
+        "wires": [
+            [
+                "6ec761bf246ab0cb"
+            ]
+        ]
+    },
+    {
+        "id": "6ec761bf246ab0cb",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 460,
+        "wires": [
+            [
+                "1ae9cdaed9dd7d99"
+            ]
+        ]
+    },
+    {
+        "id": "100134fa29e5b720",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 500,
+        "wires": [
+            [
+                "01993f7627703fb4"
+            ]
+        ]
+    },
+    {
+        "id": "01993f7627703fb4",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 500,
+        "wires": [
+            [
+                "0fcde3aca30bc419"
+            ]
+        ]
+    },
+    {
+        "id": "f72a9b080c8110b8",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 540,
+        "wires": [
+            [
+                "32c04870011f1749"
+            ]
+        ]
+    },
+    {
+        "id": "32c04870011f1749",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 540,
+        "wires": [
+            [
+                "a24db7c13b9acd11"
+            ]
+        ]
+    },
+    {
+        "id": "85f2e96c8dfa718b",
+        "type": "function",
+        "z": "b2667f9e6281a13b",
+        "name": "PUT format #3 route",
+        "func": "let Filtered_Departures = msg.payload\n\nlet poradi = \"3\" //zde je poradove cislo spoje, na ktery se ptame (0 = prvni)\nlet url = \"http://in.zivyobraz.eu/\"\nlet key = \"MEZI UVOZOVKY VLOZTE VAS TOKEN PRO VSTUP DAT DO ZIVY OBRAZ\"\nlet legend_time_A = \"Z3_Poradi_\" // Z3 znamena ze je to moje treti zastavka, o kterou se zajimam\nlet legend_time_B = \"_Odjezd\"\nlet legend_line_name = \"_Linka\"\nlet legend_destination = \"_Smer\"\nlet str = \" \"\nlet time = \"\"\nlet linka = \"\"\nlet smer = \"\"\n\nstr = Filtered_Departures[poradi].departure_timestamp.scheduled\ntime = str.slice(11, 16)\nlet time_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_time_B + \"=\" + time\nmsg.payload = time_vystup.slice(0, 220)\nvar msg_time = { payload: msg.payload };\n\nlinka = Filtered_Departures[poradi].route.short_name\nlet linka_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_line_name + \"=\" + linka\nmsg.payload = linka_vystup.slice(0, 220)\nvar msg_linka = { payload: msg.payload };\n\nsmer = Filtered_Departures[poradi].trip.headsign\nlet smer_vystup = url + \"?import_key=\" + key + \"&\" + legend_time_A + poradi + legend_destination + \"=\" + smer\nmsg.payload = smer_vystup.slice(0, 220)\nvar msg_smer = { payload: msg.payload };\n\n\nreturn [msg_time, msg_linka, msg_smer];",
+        "outputs": 3,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 640,
+        "wires": [
+            [
+                "bf20e86640dce81f"
+            ],
+            [
+                "7e9178e5938e68b9"
+            ],
+            [
+                "89c7edb8b7a5b6b9"
+            ]
+        ]
+    },
+    {
+        "id": "4e4ca62f3b949978",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "f4f8f299d182edba",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "815c5895e91c1ec5",
+        "type": "debug",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1430,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "bf20e86640dce81f",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 600,
+        "wires": [
+            [
+                "141558fbd28a1eaf"
+            ]
+        ]
+    },
+    {
+        "id": "141558fbd28a1eaf",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 600,
+        "wires": [
+            [
+                "f4f8f299d182edba"
+            ]
+        ]
+    },
+    {
+        "id": "7e9178e5938e68b9",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 640,
+        "wires": [
+            [
+                "f9bb6149ecbaaf58"
+            ]
+        ]
+    },
+    {
+        "id": "f9bb6149ecbaaf58",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 640,
+        "wires": [
+            [
+                "815c5895e91c1ec5"
+            ]
+        ]
+    },
+    {
+        "id": "89c7edb8b7a5b6b9",
+        "type": "change",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 680,
+        "wires": [
+            [
+                "8fe292e395a5e549"
+            ]
+        ]
+    },
+    {
+        "id": "8fe292e395a5e549",
+        "type": "http request",
+        "z": "b2667f9e6281a13b",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1290,
+        "y": 680,
+        "wires": [
+            [
+                "4e4ca62f3b949978"
+            ]
+        ]
+    }
+]
