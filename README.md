@@ -5,9 +5,10 @@ flow_with_filters.json contain:
 - filter of departutres - not all departing lines might be of interest
 - time offset for querry ("time to walk to stop") - this has to be added / edited at the end of the golemio querry URL in first node.
 
-NEW: flow_with_ac.json
+NEW: flow_with_ac_V2.json
   - In case the vehicle is equipped with air condition, there is an asterisk in front of the line number
   - Excessive backslashes removed from Golemio API querry, as per Golemio support note
+  - Extra t of stop name and it's import to Zivy Obraz, based on stop ids
 
 Querry
 as was:
