@@ -22,7 +22,8 @@ as it is now:
 
 /v2/pid/departureboards?ids=U693Z2P&total=3&preferredTimezone=Europe%2FPrague&minutesBefore=-9
 
-  - Regarding backslash see below the short note in CZ:
+  - Please use the second option, WITHOUT backslash, in order to ease Golemio caching
+  - Regarding backslash see below the short note in CZ, however please respect that Golemio preference is no backslash:
 
 
 (REST specifikace sama o sobě není standardem, který by formálně definovat zacházení s lomítky na konci URL. REST (Representational State Transfer) je architektonický styl navržení síťových aplikací, zejména webových služeb, a zatímco má určité obecně přijímané principy, neexistují pro něj žádné striktní pravidla či specifikace podobné těm, jaké má například W3C pro HTML. Nicméně, v praxi se doporučuje zacházet s URL konzistentně, což zahrnuje i zacházení s lomítky na konci URL. Obecně:
